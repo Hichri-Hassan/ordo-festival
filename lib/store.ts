@@ -1,7 +1,7 @@
 import { getPublicConfig, getRoundDurationSec, getSessionSchedule, getTotalRounds, isDemoMode } from "./config";
 import { computePairings } from "./matching";
 import type { Profile, SessionId, SessionState } from "./types";
-import { SESSIONS } from "./types";
+import { SESSION_NOW, SESSIONS } from "./types";
 
 const profiles = new Map<string, Profile>();
 const sessions = new Map<SessionId, SessionState>();
@@ -165,18 +165,36 @@ export function getPartnerForUser(sessionId: SessionId, userId: string) {
   };
 }
 
+function sessionRow(
+  s: { id: SessionId; label: string },
+  profileId: string,
+  demoMode: boolean,
+  startsNow: boolean
+) {
+  const session = getOrCreateSession(s.id);
+  const joined = session.participantIds.includes(profileId);
+  return {
+    ...s,
+    joined,
+    startsNow,
+    participantCount: session.participantIds.length,
+    status: session.status,
+    scheduledAt: getSessionSchedule(s.id).toISOString(),
+    demoMode,
+  };
+}
+
 export function listSessionsForUser(profileId: string) {
-  const { demoMode } = getPublicConfig();
-  return SESSIONS.map((s) => {
-    const session = getOrCreateSession(s.id);
-    const joined = session.participantIds.includes(profileId);
-    return {
-      ...s,
-      joined,
-      participantCount: session.participantIds.length,
-      status: session.status,
-      scheduledAt: getSessionSchedule(s.id).toISOString(),
-      demoMode,
-    };
-  });
+  const { demoMode, roundDurationSec, totalRounds } = getPublicConfig();
+
+  const scheduled = SESSIONS.map((s) =>
+    sessionRow(s, profileId, demoMode, demoMode)
+  );
+
+  if (!demoMode) return scheduled;
+
+  return [
+    sessionRow(SESSION_NOW, profileId, true, true),
+    ...scheduled,
+  ];
 }

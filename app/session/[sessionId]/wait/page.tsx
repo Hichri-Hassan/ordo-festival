@@ -63,7 +63,7 @@ export default function WaitPage() {
     return () => clearInterval(id);
   }, [info]);
 
-  const label = sessionId.replace("-", ":");
+  const label = sessionId === "now" ? "Maintenant" : sessionId.replace("-", ":");
 
   return (
     <Page className="text-center">

@@ -14,9 +14,9 @@ export function getTotalRounds(): number {
   return isDemoMode() ? 3 : 5;
 }
 
-/** En démo, le créneau = maintenant (countdown ~0) */
+/** Créneau immédiat ou horaire festival */
 export function getSessionSchedule(sessionId: string): Date {
-  if (isDemoMode()) {
+  if (sessionId === "now" || isDemoMode()) {
     return new Date();
   }
   const today = new Date();

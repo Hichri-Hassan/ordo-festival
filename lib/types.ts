@@ -29,7 +29,10 @@ export const SESSIONS = [
   { id: "17-00", label: "17:00", hour: 17, minute: 0 },
 ] as const;
 
-export type SessionId = (typeof SESSIONS)[number]["id"];
+/** Session immédiate (mode test / démo uniquement) */
+export const SESSION_NOW = { id: "now", label: "Maintenant" } as const;
+
+export type SessionId = (typeof SESSIONS)[number]["id"] | typeof SESSION_NOW.id;
 
 export type Profile = {
   id: string;

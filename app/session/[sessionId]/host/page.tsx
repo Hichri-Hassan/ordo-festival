@@ -11,7 +11,7 @@ export default function HostPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [done, setDone] = useState(false);
   const [roundSec, setRoundSec] = useState(120);
-  const label = sessionId.replace("-", ":");
+  const label = sessionId === "now" ? "Maintenant" : sessionId.replace("-", ":");
 
   useEffect(() => {
     api<{ roundDurationSec: number }>("/api/config").then((c) =>
