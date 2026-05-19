@@ -13,6 +13,16 @@ export async function POST(
     return NextResponse.json({ error: "profileId requis" }, { status: 400 });
   }
 
-  const session = checkIn(sessionId as SessionId, profileId);
-  return NextResponse.json(session);
+  try {
+    const session = checkIn(sessionId as SessionId, profileId);
+    return NextResponse.json(session);
+  } catch (e) {
+    if (e instanceof Error && e.message === "PROFILE_NOT_FOUND") {
+      return NextResponse.json(
+        { error: "PROFILE_NOT_FOUND", profileMissing: true },
+        { status: 404 }
+      );
+    }
+    throw e;
+  }
 }

@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Card, Heading, Logo, Page, Tag, TimerRing } from "@/components/ui";
-import { api, getStoredProfileId } from "@/lib/client";
+import { api, clearStoredProfileId, getStoredProfileId, isProfileNotFound } from "@/lib/client";
 
 type PartnerPayload = {
   partner: {
@@ -19,6 +20,8 @@ type PartnerPayload = {
   roundEndsAt: number | null;
   roundDurationSec?: number;
   status: string;
+  validCheckedIn?: number;
+  profileMissing?: boolean;
 };
 
 export default function LivePage() {
@@ -28,6 +31,9 @@ export default function LivePage() {
   const [secondsLeft, setSecondsLeft] = useState(15);
   const [transitioning, setTransitioning] = useState(false);
   const [total, setTotal] = useState(120);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const sessionLabel = sessionId === "now" ? "Maintenant" : sessionId.replace("-", ":");
 
   useEffect(() => {
     const profileId = getStoredProfileId();
@@ -36,10 +42,18 @@ export default function LivePage() {
       return;
     }
 
-    const load = () =>
-      api<PartnerPayload>(
-        `/api/sessions/${sessionId}/partner?profileId=${profileId}`
-      ).then((d) => {
+    const load = async () => {
+      try {
+        const d = await api<PartnerPayload>(
+          `/api/sessions/${sessionId}/partner?profileId=${profileId}`
+        );
+        setLoadError(null);
+
+        if (d.profileMissing) {
+          clearStoredProfileId();
+          router.replace("/onboarding");
+          return;
+        }
         if (d.status === "ended") {
           router.replace(`/session/${sessionId}/done`);
           return;
@@ -54,7 +68,15 @@ export default function LivePage() {
         if (d.roundEndsAt) {
           setSecondsLeft(Math.max(0, Math.ceil((d.roundEndsAt - Date.now()) / 1000)));
         }
-      });
+      } catch (e) {
+        if (isProfileNotFound(e)) {
+          clearStoredProfileId();
+          router.replace("/onboarding");
+          return;
+        }
+        setLoadError("Connexion impossible. Réessaie.");
+      }
+    };
 
     load();
     const poll = setInterval(load, 2000);
@@ -73,16 +95,48 @@ export default function LivePage() {
     return () => clearInterval(id);
   }, [data?.roundEndsAt, data?.round]);
 
+  if (loadError) {
+    return (
+      <Page className="text-center">
+        <Logo />
+        <p className="mt-4 text-[var(--color-ink-muted)]">{loadError}</p>
+      </Page>
+    );
+  }
+
   if (!data?.partner) {
+    const valid = data?.validCheckedIn ?? 0;
     return (
       <Page className="flex flex-col items-center justify-center text-center">
         <Logo />
-        <p className="mt-4 text-[var(--color-ink-muted)] animate-pulse-soft">
-          En attente d&apos;un partenaire…
-        </p>
-        <p className="mt-2 text-sm text-[var(--color-ink-faint)]">
-          Assure-toi d&apos;être au moins 2 au stand
-        </p>
+        <Heading sub={`Session ${sessionLabel}`}>En attente d&apos;un partenaire</Heading>
+
+        <Card className="mb-6 text-left text-sm leading-relaxed text-[var(--color-ink-muted)]">
+          <p>
+            <strong className="text-[var(--color-ink)]">{valid}</strong> personne
+            {valid !== 1 ? "s" : ""} prête{valid !== 1 ? "s" : ""} (check-in valide).
+            Il en faut <strong className="text-[var(--color-ink)]">2 minimum</strong>.
+          </p>
+          <ul className="mt-3 list-inside list-disc space-y-1">
+            <li>Même session sur tous les appareils (ex. « Maintenant »)</li>
+            <li>Chaque téléphone : onboarding + check-in</li>
+            <li>iPad : <code className="text-xs">/session/{sessionId}/host</code> → Lancer</li>
+            <li>Après un redéploiement : refais l&apos;onboarding sur chaque appareil</li>
+          </ul>
+        </Card>
+
+        <Link
+          href={`/session/${sessionId}/checkin`}
+          className="mb-3 inline-flex w-full justify-center rounded-xl bg-[var(--color-ink)] px-5 py-3.5 text-base font-medium text-white"
+        >
+          Faire le check-in
+        </Link>
+        <Link
+          href="/onboarding"
+          className="text-sm text-[var(--color-ink-muted)] underline"
+        >
+          Refaire mon profil
+        </Link>
       </Page>
     );
   }

@@ -11,6 +11,7 @@ type SessionInfo = {
   status: string;
   scheduledAt: string;
   checkedInCount: number;
+  validCheckedIn?: number;
   participantCount: number;
   demoMode?: boolean;
 };
@@ -80,7 +81,8 @@ export default function WaitPage() {
         </p>
         {info && (
           <p className="mt-4 text-sm text-[var(--color-ink-muted)]">
-            {info.checkedInCount} présent{info.checkedInCount !== 1 ? "s" : ""} au stand ·{" "}
+            {info.validCheckedIn ?? info.checkedInCount} prêt
+            {(info.validCheckedIn ?? info.checkedInCount) !== 1 ? "s" : ""} ·{" "}
             {info.participantCount} inscrit{info.participantCount !== 1 ? "s" : ""}
           </p>
         )}

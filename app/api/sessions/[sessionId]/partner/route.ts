@@ -15,19 +15,25 @@ export async function GET(
   }
 
   let data = getPartnerForUser(sessionId as SessionId, profileId);
-  if (!data) {
-    return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
+
+  if (data.profileMissing) {
+    return NextResponse.json(
+      { error: "PROFILE_NOT_FOUND", profileMissing: true },
+      { status: 404 }
+    );
   }
 
-  const { session, partner, sharedInterests, icebreaker, roundEndsAt } = data;
+  const { session, roundEndsAt } = data;
 
-  if (
-    session.status === "live" &&
-    roundEndsAt &&
-    Date.now() >= roundEndsAt
-  ) {
+  if (session.status === "live" && roundEndsAt && Date.now() >= roundEndsAt) {
     advanceRound(sessionId as SessionId);
     data = getPartnerForUser(sessionId as SessionId, profileId)!;
+    if (data.profileMissing) {
+      return NextResponse.json(
+        { error: "PROFILE_NOT_FOUND", profileMissing: true },
+        { status: 404 }
+      );
+    }
   }
 
   const s = data.session;
@@ -40,6 +46,7 @@ export async function GET(
 
   return NextResponse.json({
     demoMode,
+    profileMissing: false,
     partner: data.partner,
     sharedInterests: data.sharedInterests,
     icebreaker: data.icebreaker,
@@ -49,5 +56,6 @@ export async function GET(
     roundDurationSec: s.roundDurationSec,
     status: s.status,
     checkedInCount: s.checkedInIds.length,
+    validCheckedIn: data.validCheckedIn,
   });
 }

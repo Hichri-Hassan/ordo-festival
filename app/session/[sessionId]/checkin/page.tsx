@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Heading, Logo, Page } from "@/components/ui";
-import { api, getStoredProfileId } from "@/lib/client";
+import { api, clearStoredProfileId, getStoredProfileId, isProfileNotFound } from "@/lib/client";
 
 export default function CheckinPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -29,7 +29,14 @@ export default function CheckinPage() {
           router.replace(`/session/${sessionId}/wait`);
         }
       })
-      .catch(() => setStatus("error"));
+      .catch((e) => {
+        if (isProfileNotFound(e)) {
+          clearStoredProfileId();
+          router.replace("/onboarding");
+          return;
+        }
+        setStatus("error");
+      });
   }, [sessionId, router]);
 
   return (
