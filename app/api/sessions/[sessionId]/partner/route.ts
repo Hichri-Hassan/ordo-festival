@@ -36,7 +36,10 @@ export async function GET(
       ? s.roundStartedAt + s.roundDurationSec * 1000
       : null;
 
+  const { demoMode } = getPublicConfig();
+
   return NextResponse.json({
+    demoMode,
     partner: data.partner,
     sharedInterests: data.sharedInterests,
     icebreaker: data.icebreaker,
@@ -46,6 +49,5 @@ export async function GET(
     roundDurationSec: s.roundDurationSec,
     status: s.status,
     checkedInCount: s.checkedInIds.length,
-    ...getPublicConfig(),
   });
 }
