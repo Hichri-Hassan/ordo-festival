@@ -1,14 +1,14 @@
 export const ICEBREAKERS = [
-  "Quel est ton projet de rêve sur le campus ?",
-  "Quel est ton événement campus préféré ?",
-  "Quel est le plus gros problème de ton campus ?",
-  "Startup ou corporate après les études ?",
-  "Quelle compétence aimerais-tu apprendre cette année ?",
-  "Quel sport pratiques-tu (ou aimerais-tu pratiquer) ?",
-  "Quelle serait l'app étudiante idéale ?",
-  "Quelle est la meilleure façon de rencontrer des gens sur ton campus ?",
-  "Quelle association te fait envie ?",
-  "Si tu avais 24h pour organiser un événement campus, ce serait quoi ?",
+  "Pourquoi t'es au Pépite Festival ?",
+  "Qu'est-ce qu'il manque au Pépite Festival à part un bon food truck ?",
+  "Ton asso préférée du campus ?",
+  "Un projet Pépite qui pourrait vraiment marcher",
+  "Le truc le plus relou à la fac à part les CM à 8h",
+  "Une anecdote récente",
+  "Décris ton université sans dire son nom",
+  "Ta ville/pays si c'était un animal ou un objet",
+  "Une app que tous les étudiants utiliseraient",
+  "Un événement campus qui marcherait à coup sûr",
 ];
 
 export function pickIcebreaker(round: number, pairKey: string): string {
