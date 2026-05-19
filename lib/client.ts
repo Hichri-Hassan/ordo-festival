@@ -1,4 +1,19 @@
 const PROFILE_KEY = "ordo_profile_id";
+const RETURN_KEY = "ordo_return_after_onboarding";
+
+/** Où renvoyer l'utilisateur après création du profil (ex. lien check-in QR) */
+export function setReturnAfterOnboarding(path: string): void {
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem(RETURN_KEY, path);
+}
+
+export function consumeReturnAfterOnboarding(): string | null {
+  if (typeof window === "undefined") return null;
+  const path = sessionStorage.getItem(RETURN_KEY);
+  sessionStorage.removeItem(RETURN_KEY);
+  if (!path || !path.startsWith("/")) return null;
+  return path;
+}
 
 export function getStoredProfileId(): string | null {
   if (typeof window === "undefined") return null;

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button, Chip, Heading, Logo, Page } from "@/components/ui";
-import { api, setStoredProfileId } from "@/lib/client";
+import { api, consumeReturnAfterOnboarding, setStoredProfileId } from "@/lib/client";
 import { INTERESTS, LOOKING_FOR, STUDY_YEARS } from "@/lib/types";
 import type { Profile } from "@/lib/types";
 
@@ -31,7 +31,8 @@ export default function OnboardingPage() {
         body: JSON.stringify({ firstName, studyYear, interests, lookingFor }),
       });
       setStoredProfileId(profile.id);
-      router.push("/sessions");
+      const returnTo = consumeReturnAfterOnboarding();
+      router.push(returnTo ?? "/sessions");
     } catch {
       setLoading(false);
     }
