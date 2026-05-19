@@ -39,7 +39,12 @@ export default function NetworkingLandingPage() {
       </Card>
 
       <Button href="/onboarding">Commencer</Button>
-      <p className="mt-6 text-center text-xs text-[var(--color-ink-faint)]">
+      <p className="mt-6 text-center text-sm text-[var(--color-ink-muted)]">
+        <a href="/stand" className="underline underline-offset-2">
+          QR codes du stand →
+        </a>
+      </p>
+      <p className="mt-2 text-center text-xs text-[var(--color-ink-faint)]">
         Ordo · Pépite Festival
       </p>
     </Page>
