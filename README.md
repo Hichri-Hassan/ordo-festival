@@ -9,6 +9,31 @@ npm install
 npm run dev
 ```
 
+### Tester tout de suite (mode démo)
+
+En local (`npm run dev`), le **mode test** est activé automatiquement :
+
+- Pas d’attente jusqu’à 14h / 15h…
+- Tours de **15 secondes** (au lieu de 2 min)
+- **3 rotations** (au lieu de 5)
+
+Sur **Railway**, ajoute la variable d’environnement puis redéploie :
+
+| Variable | Valeur |
+|----------|--------|
+| `ORDO_DEMO_MODE` | `true` |
+
+Tu verras une bannière **« Mode test actif »** sur le site.
+
+**Test rapide (2 téléphones) :**
+
+1. `https://TON-URL/networking` → onboarding sur chaque téléphone  
+2. Même session (ex. 14:00) → check-in (`/session/14-00/checkin`)  
+3. iPad : `/session/14-00/host` → **Lancer maintenant** (ou auto si 2 check-in)  
+4. Les deux voient partenaire + timer 15 s  
+
+Avant le festival : mets `ORDO_DEMO_MODE` à `false` ou supprime la variable.
+
 Ouvre [http://localhost:3000/networking](http://localhost:3000/networking)
 
 ## Parcours étudiant

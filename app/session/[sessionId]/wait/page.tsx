@@ -2,6 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { DemoBanner } from "@/components/DemoBanner";
 import { Button, Card, Heading, Logo, Page } from "@/components/ui";
 import { api, getStoredProfileId } from "@/lib/client";
 
@@ -11,6 +12,7 @@ type SessionInfo = {
   scheduledAt: string;
   checkedInCount: number;
   participantCount: number;
+  demoMode?: boolean;
 };
 
 function formatCountdown(ms: number) {
@@ -66,13 +68,16 @@ export default function WaitPage() {
   return (
     <Page className="text-center">
       <Logo size="sm" />
-      <Heading sub={`Session ${label}`}>On t'attend au stand</Heading>
+      <DemoBanner />
+      <Heading sub={`Session ${label}`}>On t&apos;attend au stand</Heading>
 
       <Card className="mb-6 py-10">
         <p className="text-sm uppercase tracking-widest text-[var(--color-ink-faint)]">
-          Début dans
+          {info?.demoMode ? "Prêt à tester" : "Début dans"}
         </p>
-        <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight">{countdown}</p>
+        <p className="mt-2 text-5xl font-semibold tabular-nums tracking-tight">
+          {info?.demoMode ? "Maintenant" : countdown}
+        </p>
         {info && (
           <p className="mt-4 text-sm text-[var(--color-ink-muted)]">
             {info.checkedInCount} présent{info.checkedInCount !== 1 ? "s" : ""} au stand ·{" "}

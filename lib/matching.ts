@@ -65,12 +65,4 @@ export function computePairings(
   return { pairings, icebreakers };
 }
 
-export function getSessionSchedule(sessionId: string): Date {
-  const today = new Date();
-  const [h, m] = sessionId.split("-").map(Number);
-  const start = new Date(today);
-  start.setHours(h, m, 0, 0);
-  return start;
-}
-
 export { ROUNDS };

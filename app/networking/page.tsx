@@ -1,9 +1,11 @@
+import { DemoBanner } from "@/components/DemoBanner";
 import { Button, Card, Heading, Logo, Page } from "@/components/ui";
 
 export default function NetworkingLandingPage() {
   return (
     <Page className="flex flex-col justify-center">
       <Logo />
+      <DemoBanner />
       <Heading
         sub={
           <>

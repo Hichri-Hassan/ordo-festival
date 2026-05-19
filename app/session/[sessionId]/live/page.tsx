@@ -17,6 +17,7 @@ type PartnerPayload = {
   round: number;
   totalRounds: number;
   roundEndsAt: number | null;
+  roundDurationSec?: number;
   status: string;
 };
 
@@ -24,9 +25,9 @@ export default function LivePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
   const [data, setData] = useState<PartnerPayload | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState(120);
+  const [secondsLeft, setSecondsLeft] = useState(15);
   const [transitioning, setTransitioning] = useState(false);
-  const total = 120;
+  const [total, setTotal] = useState(120);
 
   useEffect(() => {
     const profileId = getStoredProfileId();
@@ -49,6 +50,7 @@ export default function LivePage() {
         }
         setData(d);
         setTransitioning(false);
+        if (d.roundDurationSec) setTotal(d.roundDurationSec);
         if (d.roundEndsAt) {
           setSecondsLeft(Math.max(0, Math.ceil((d.roundEndsAt - Date.now()) / 1000)));
         }
@@ -132,7 +134,7 @@ export default function LivePage() {
       <TimerRing seconds={secondsLeft} total={total} />
 
       <p className="mt-8 text-center text-sm text-[var(--color-ink-faint)]">
-        2 minutes — puis nouveau partenaire
+        {total >= 60 ? `${total / 60} min` : `${total} sec`} — puis nouveau partenaire
       </p>
     </Page>
   );

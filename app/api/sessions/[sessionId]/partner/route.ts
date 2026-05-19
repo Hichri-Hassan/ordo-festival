@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getPublicConfig } from "@/lib/config";
 import { advanceRound, getPartnerForUser } from "@/lib/store";
 import type { SessionId } from "@/lib/types";
 
@@ -42,7 +43,9 @@ export async function GET(
     round: s.currentRound + 1,
     totalRounds: s.totalRounds,
     roundEndsAt: endsAt,
+    roundDurationSec: s.roundDurationSec,
     status: s.status,
     checkedInCount: s.checkedInIds.length,
+    ...getPublicConfig(),
   });
 }

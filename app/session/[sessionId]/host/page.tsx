@@ -1,7 +1,8 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { DemoBanner } from "@/components/DemoBanner";
 import { Button, Card, Heading, Logo, Page } from "@/components/ui";
 import { api } from "@/lib/client";
 
@@ -9,7 +10,14 @@ import { api } from "@/lib/client";
 export default function HostPage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [done, setDone] = useState(false);
+  const [roundSec, setRoundSec] = useState(120);
   const label = sessionId.replace("-", ":");
+
+  useEffect(() => {
+    api<{ roundDurationSec: number }>("/api/config").then((c) =>
+      setRoundSec(c.roundDurationSec)
+    );
+  }, []);
 
   async function start() {
     await api(`/api/sessions/${sessionId}/start`, { method: "POST" });
@@ -19,12 +27,12 @@ export default function HostPage() {
   return (
     <Page className="text-center">
       <Logo />
+      <DemoBanner />
       <Heading sub={`Session ${label} · mode hôte`}>Démarrer la session</Heading>
 
       <Card className="mb-6">
         <p className="text-sm text-[var(--color-ink-muted)]">
-          À utiliser au stand quand les participants sont prêts. Lance les 5 rotations de 2
-          minutes.
+          Quand les participants sont prêts, lance la session. Tours de {roundSec} secondes.
         </p>
       </Card>
 

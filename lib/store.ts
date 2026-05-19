@@ -1,8 +1,7 @@
-import { computePairings, getSessionSchedule, ROUNDS } from "./matching";
-import type { Profile, SessionId, SessionState, SessionStatus } from "./types";
+import { getPublicConfig, getRoundDurationSec, getSessionSchedule, getTotalRounds, isDemoMode } from "./config";
+import { computePairings } from "./matching";
+import type { Profile, SessionId, SessionState } from "./types";
 import { SESSIONS } from "./types";
-
-const ROUND_DURATION_SEC = 120;
 
 const profiles = new Map<string, Profile>();
 const sessions = new Map<SessionId, SessionState>();
@@ -14,8 +13,8 @@ function createSession(sessionId: SessionId): SessionState {
     checkedInIds: [],
     status: "waiting",
     currentRound: 0,
-    totalRounds: ROUNDS,
-    roundDurationSec: ROUND_DURATION_SEC,
+    totalRounds: getTotalRounds(),
+    roundDurationSec: getRoundDurationSec(),
     roundStartedAt: null,
     pairings: {},
     icebreakers: {},
@@ -25,7 +24,13 @@ function createSession(sessionId: SessionId): SessionState {
 }
 
 export function getOrCreateSession(sessionId: SessionId): SessionState {
-  return sessions.get(sessionId) ?? createSession(sessionId);
+  const existing = sessions.get(sessionId);
+  if (existing) {
+    existing.totalRounds = getTotalRounds();
+    existing.roundDurationSec = getRoundDurationSec();
+    return existing;
+  }
+  return createSession(sessionId);
 }
 
 export function saveProfile(profile: Profile): void {
@@ -69,15 +74,16 @@ function startRound(session: SessionState, round: number): void {
   session.pairings = pairings;
   session.icebreakers = icebreakers;
   session.roundStartedAt = Date.now();
+  session.roundDurationSec = getRoundDurationSec();
+  session.totalRounds = getTotalRounds();
 }
 
 export function maybeStartSession(session: SessionState): SessionState {
   if (session.status !== "waiting") return session;
 
-  const now = Date.now();
-  const scheduled = getSessionSchedule(session.sessionId).getTime();
   const checkedIn = session.checkedInIds.length >= 2;
-  const timeReached = now >= scheduled - 60_000; // 1 min before slot
+  const timeReached =
+    isDemoMode() || Date.now() >= getSessionSchedule(session.sessionId).getTime() - 60_000;
 
   if (checkedIn && timeReached) {
     session.status = "live";
@@ -116,6 +122,7 @@ export function getSessionPublic(sessionId: SessionId) {
   const scheduled = getSessionSchedule(sessionId);
   return {
     ...session,
+    ...getPublicConfig(),
     scheduledAt: scheduled.toISOString(),
     participantCount: session.participantIds.length,
     checkedInCount: session.checkedInIds.length,
@@ -159,6 +166,7 @@ export function getPartnerForUser(sessionId: SessionId, userId: string) {
 }
 
 export function listSessionsForUser(profileId: string) {
+  const { demoMode } = getPublicConfig();
   return SESSIONS.map((s) => {
     const session = getOrCreateSession(s.id);
     const joined = session.participantIds.includes(profileId);
@@ -168,6 +176,7 @@ export function listSessionsForUser(profileId: string) {
       participantCount: session.participantIds.length,
       status: session.status,
       scheduledAt: getSessionSchedule(s.id).toISOString(),
+      demoMode,
     };
   });
 }
