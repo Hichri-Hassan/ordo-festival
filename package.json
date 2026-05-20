@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "verify": "npm run build"
   },
   "dependencies": {
     "nanoid": "^5.1.5",
