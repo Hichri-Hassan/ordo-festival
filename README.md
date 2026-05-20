@@ -34,6 +34,8 @@ Tu verras une bannière **« Mode test actif »** sur le site.
 
 Avant le festival : mets `ORDO_DEMO_MODE` à `false` ou supprime la variable.
 
+**Compteur sur la page hôte :** ce n’est pas “qui a scanné le QR au stand”. Chaque téléphone qui **ouvre le lien check-in** (QR ou URL) est compté, et les données restent en mémoire sur Railway jusqu’au prochain redéploiement. En mode test, la page hôte propose **Vider cette session** pour repartir à 0.
+
 Ouvre [http://localhost:3000/networking](http://localhost:3000/networking)
 
 ## Parcours étudiant
