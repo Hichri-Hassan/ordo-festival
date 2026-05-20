@@ -56,6 +56,11 @@ export type SessionState = {
   roundStartedAt: number | null;
   pairings: Record<string, string>;
   icebreakers: Record<string, string>;
+  /** Code dans l’URL check-in (?wave=). Change à chaque vague. */
+  waveCode: string;
+  waveIssuedAt: number;
+  /** true pendant la session live — pas de rotation de vague */
+  waveLocked: boolean;
 };
 
 export type PartnerView = {

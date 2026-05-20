@@ -32,6 +32,15 @@ export default function LivePage() {
   const [transitioning, setTransitioning] = useState(false);
   const [total, setTotal] = useState(120);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [wave, setWave] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadWave = () =>
+      api<{ waveCode: string }>(`/api/sessions/${sessionId}`).then((s) => setWave(s.waveCode));
+    loadWave();
+    const id = setInterval(loadWave, 4000);
+    return () => clearInterval(id);
+  }, [sessionId]);
 
   const sessionLabel = sessionId === "now" ? "Maintenant" : sessionId.replace("-", ":");
 
@@ -126,7 +135,11 @@ export default function LivePage() {
         </Card>
 
         <Link
-          href={`/session/${sessionId}/checkin`}
+          href={
+            wave
+              ? `/session/${sessionId}/checkin?wave=${encodeURIComponent(wave)}`
+              : "/sessions"
+          }
           className="mb-3 inline-flex w-full justify-center rounded-xl bg-[var(--color-ink)] px-5 py-3.5 text-base font-medium text-white"
         >
           Faire le check-in

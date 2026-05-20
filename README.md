@@ -22,8 +22,9 @@ Sur **Railway**, ajoute la variable d’environnement puis redéploie :
 | Variable | Valeur |
 |----------|--------|
 | `ORDO_DEMO_MODE` | `true` |
+| `ORDO_WAVE_MINUTES` | `5` (défaut) — durée d’une vague avant nouveau code check-in |
 
-Tu verras une bannière **« Mode test actif »** sur le site.
+Chaque session a un **code vague** dans l’URL : `/session/now/checkin?wave=XXXXXX`. Toutes les X minutes (ou à la fin d’une session live), le code change : les anciens QR / liens ne comptent plus. L’**iPad hôte** et la page **`/stand`** affichent un QR **mis à jour** automatiquement.
 
 **Test rapide (2 téléphones) :**
 

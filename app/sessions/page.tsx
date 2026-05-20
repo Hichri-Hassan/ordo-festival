@@ -4,13 +4,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { DemoBanner } from "@/components/DemoBanner";
 import { Card, Heading, Logo, Page } from "@/components/ui";
-import { api, getStoredProfileId } from "@/lib/client";
+import { api, ApiError, getStoredProfileId } from "@/lib/client";
 
 type SessionRow = {
   id: string;
   label: string;
   joined: boolean;
   startsNow?: boolean;
+  waveCode: string;
+  waveExpiresAt?: number;
   participantCount: number;
   status: string;
   scheduledAt: string;
@@ -48,10 +50,11 @@ export default function SessionsPage() {
   }, [router]);
 
   async function openSession(session: SessionRow) {
+    const wave = session.waveCode;
     if (session.joined) {
       router.push(
         session.startsNow
-          ? `/session/${session.id}/checkin`
+          ? `/session/${session.id}/checkin?wave=${encodeURIComponent(wave)}`
           : `/session/${session.id}/wait`
       );
       return;
@@ -59,15 +62,24 @@ export default function SessionsPage() {
     const profileId = getStoredProfileId();
     if (!profileId) return;
     setJoining(session.id);
-    await api(`/api/sessions/${session.id}/join`, {
-      method: "POST",
-      body: JSON.stringify({ profileId }),
-    });
-    router.push(
-      session.startsNow
-        ? `/session/${session.id}/checkin`
-        : `/session/${session.id}/wait`
-    );
+    try {
+      await api(`/api/sessions/${session.id}/join`, {
+        method: "POST",
+        body: JSON.stringify({ profileId, wave }),
+      });
+      router.push(
+        session.startsNow
+          ? `/session/${session.id}/checkin?wave=${encodeURIComponent(wave)}`
+          : `/session/${session.id}/wait`
+      );
+    } catch (e) {
+      if (e instanceof ApiError && e.code === "WAVE_INVALID") {
+        window.alert("Ce créneau a renouvelé son code. Reviens à la liste des sessions.");
+        window.location.reload();
+      }
+    } finally {
+      setJoining(null);
+    }
   }
 
   if (loading) {

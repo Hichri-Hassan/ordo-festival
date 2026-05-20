@@ -31,5 +31,12 @@ export function getPublicConfig() {
     demoMode: isDemoMode(),
     roundDurationSec: getRoundDurationSec(),
     totalRounds: getTotalRounds(),
+    waveDurationMs: getWaveDurationMs(),
   };
+}
+
+/** Durée d'une vague (lien check-in valide). Défaut 5 min. */
+export function getWaveDurationMs(): number {
+  const mins = parseInt(process.env.ORDO_WAVE_MINUTES ?? "5", 10);
+  return Math.max(1, Math.min(60, mins)) * 60 * 1000;
 }

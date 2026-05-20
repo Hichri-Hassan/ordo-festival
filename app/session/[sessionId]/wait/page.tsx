@@ -14,6 +14,7 @@ type SessionInfo = {
   validCheckedIn?: number;
   participantCount: number;
   demoMode?: boolean;
+  waveCode?: string;
 };
 
 function formatCountdown(ms: number) {
@@ -93,7 +94,15 @@ export default function WaitPage() {
         premier partenaire.
       </p>
 
-      <Button href={`/session/${sessionId}/checkin`}>J&apos;arrive au stand — scanner</Button>
+      <Button
+        href={
+          info?.waveCode
+            ? `/session/${sessionId}/checkin?wave=${encodeURIComponent(info.waveCode)}`
+            : "/sessions"
+        }
+      >
+        J&apos;arrive au stand — scanner
+      </Button>
     </Page>
   );
 }
