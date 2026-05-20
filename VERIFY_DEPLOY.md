@@ -60,3 +60,49 @@ Si une de ces URLs ne marche pas alors que le deploy est vert, vide le cache du 
 | `ORDO_WAVE_MINUTES` | `5` (durée d’une vague check-in) |
 
 Après changement de variables, Railway **redéploie** tout seul.
+
+---
+
+## 5. Tester « pour de vrai » sur Railway (mode démo)
+
+Sans ça, `/api/config` affiche `demoMode: false` → **2 min × 5 tours** et horaires 14h–17h (festival réel).
+
+### Activer le mode test
+
+1. [railway.app](https://railway.app) → projet → service **ordo-festival** (ou le nom de ton service).
+2. Onglet **Variables** (ou **Settings → Variables** selon l’UI).
+3. **New Variable**  
+   - **Name :** `ORDO_DEMO_MODE`  
+   - **Value :** `true`  
+   (respecter exactement `true`, pas `True` ni `1`.)
+4. **Add** / **Save** → attend **30 s à 2 min** : un nouveau déploiement démarre tout seul.
+
+### Vérifier que c’est bien actif
+
+Ouvre en navigation privée (évite le cache) :
+
+`https://TON-URL/api/config`
+
+Tu dois voir **exactement** :
+
+```json
+{
+  "demoMode": true,
+  "roundDurationSec": 15,
+  "totalRounds": 3,
+  "waveDurationMs": 300000
+}
+```
+
+- Si `demoMode` est encore `false` → la variable n’est pas sur le **bon service**, ou le redeploy n’est pas fini, ou faute de frappe.
+
+### Parcours de test (2 téléphones + ton PC)
+
+1. **PC** : `https://TON-URL/session/now/host` (QR + compteur + **Lancer**).
+2. **Tél A & B** : `https://TON-URL/networking` → onboarding → **Maintenant** → check-in (lien avec `?wave=` depuis le QR du PC).
+3. Quand l’hôte affiche **≥ 2 prêts** → **Lancer maintenant**.
+4. Les deux tél : écran **live** avec prénom + timer **~15 s**.
+
+### Après les tests
+
+Supprime `ORDO_DEMO_MODE` ou mets `false` → retour config festival (`demoMode: false`, 120 s, 5 tours).
