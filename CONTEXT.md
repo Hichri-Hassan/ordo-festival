@@ -22,7 +22,7 @@ Use this document to onboard ChatGPT (or another assistant) on what was built an
 4. **Session selection:** join one or more slots (14:00, 15:00, 16:00, 17:00)
 5. **Waiting screen:** countdown until session (in-browser, not phone push)
 6. At stand: scans **session check-in QR**
-7. Host on iPad taps **Start session** (or auto-start when ≥2 checked in + time reached)
+7. Host on iPad/PC taps **Start session** — no auto-start when 2 people check in
 8. **Live screen:** partner name, shared interests, icebreaker question, 2-minute timer (15s in demo mode)
 9. Timer ends → rotate partner → repeat 5 times (~10 min total, 3 times in demo)
 10. Session complete → thank-you page

@@ -30,7 +30,7 @@ Chaque session a un **code vague** dans l’URL : `/session/now/checkin?wave=XXX
 
 1. `https://TON-URL/networking` → onboarding sur chaque téléphone  
 2. Même session (ex. 14:00) → check-in (`/session/14-00/checkin`)  
-3. iPad : `/session/14-00/host` → **Lancer maintenant** (ou auto si 2 check-in)  
+3. iPad / PC : `/session/14-00/host` → **Lancer maintenant** (obligatoire, pas de démarrage auto)  
 4. Les deux voient partenaire + timer 15 s  
 
 Avant le festival : mets `ORDO_DEMO_MODE` à `false` ou supprime la variable.
@@ -61,9 +61,7 @@ Ouvre [http://localhost:3000/networking](http://localhost:3000/networking)
 
 ## Mode hôte (stand)
 
-Sur un iPad au stand, ouvre `/session/14-00/host` (etc.) et appuie sur **Lancer maintenant** quand ~10 participants ont scanné le QR check-in.
-
-La session démarre aussi automatiquement si ≥2 personnes sont check-in et l’heure du créneau est atteinte.
+Sur l’iPad ou le PC : `/session/14-00/host` (etc.) → **Lancer maintenant** quand ~10 participants ont fait le check-in avec le QR du moment. La session **ne démarre pas** toute seule : c’est toujours le hôte qui lance.
 
 ## Matching
 

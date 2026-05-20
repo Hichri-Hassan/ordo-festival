@@ -5,7 +5,6 @@ import {
   getSessionSchedule,
   getTotalRounds,
   getWaveDurationMs,
-  isDemoMode,
 } from "./config";
 import { computePairings } from "./matching";
 import type { Profile, SessionId, SessionState } from "./types";
@@ -137,7 +136,6 @@ export function checkIn(sessionId: SessionId, profileId: string, wave: string): 
   if (!session.checkedInIds.includes(profileId)) {
     session.checkedInIds.push(profileId);
   }
-  maybeStartSession(session);
   return session;
 }
 
@@ -162,17 +160,7 @@ function startRound(session: SessionState, round: number): boolean {
 }
 
 export function maybeStartSession(session: SessionState): SessionState {
-  if (session.status !== "waiting") return session;
-
-  const validCount = getValidCheckedInProfiles(session).length;
-  const timeReached =
-    isDemoMode() || Date.now() >= getSessionSchedule(session.sessionId).getTime() - 60_000;
-
-  if (validCount >= 2 && timeReached) {
-    session.status = "live";
-    if (!startRound(session, 0)) session.status = "waiting";
-    else session.waveLocked = true;
-  }
+  /** Le hôte lance toujours via « Lancer maintenant » — pas de démarrage auto quand 2 check-in. */
   return session;
 }
 
