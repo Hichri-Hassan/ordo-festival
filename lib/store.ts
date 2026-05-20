@@ -155,6 +155,21 @@ export function advanceRound(sessionId: SessionId): SessionState {
   return session;
 }
 
+/** Vide inscriptions + check-ins de cette session (retester à zéro). Les profils restent sur le serveur. */
+export function resetSessionState(sessionId: SessionId): SessionState {
+  const session = getOrCreateSession(sessionId);
+  session.participantIds = [];
+  session.checkedInIds = [];
+  session.status = "waiting";
+  session.currentRound = 0;
+  session.roundStartedAt = null;
+  session.pairings = {};
+  session.icebreakers = {};
+  session.totalRounds = getTotalRounds();
+  session.roundDurationSec = getRoundDurationSec();
+  return session;
+}
+
 export function getSessionPublic(sessionId: SessionId) {
   const session = getOrCreateSession(sessionId);
   maybeStartSession(session);
