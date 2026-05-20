@@ -57,9 +57,35 @@ Si une de ces URLs ne marche pas alors que le deploy est vert, vide le cache du 
 | Variable | Exemple |
 |----------|---------|
 | `ORDO_DEMO_MODE` | `true` pour tester |
-| `ORDO_WAVE_MINUTES` | `5` (durée d’une vague check-in) |
+| `ORDO_WAVE_MINUTES` | `5` — durée d’une vague check-in (minutes) |
+| `ORDO_BUILD_LABEL` | Optionnel — texte libre affiché dans `/api/config` (ex. `test-20mai`) pour confirmer le bon deploy |
 
 Après changement de variables, Railway **redéploie** tout seul.
+
+---
+
+## Vérifier que le **bon code** est en ligne
+
+### Méthode 1 — Railway (la plus fiable)
+
+1. **Deployments** → ouvre le dernier deploy **vert**.
+2. Note le **commit** affiché (ex. `e5b2844`).
+3. Sur **GitHub** → ton repo → dernier commit sur `main` : les **7 premiers caractères** doivent **matcher**.
+
+### Méthode 2 — `/api/config` dans le navigateur
+
+Ouvre : `https://TON-URL/api/config`
+
+- Si tu vois **`commitShort`** (ex. `"e5b2844"`) → compare avec GitHub (Railway injecte souvent `RAILWAY_GIT_COMMIT_SHA`).
+- Si `commitShort` est `null` → utilise la méthode 1, ou ajoute sur Railway une variable **`ORDO_BUILD_LABEL`** = par ex. `v2-no-autostart`, sauvegarde, redeploy, puis recharge `/api/config` : tu dois voir `"buildLabel":"v2-no-autostart"`.
+
+### Méthode 3 — Comportement (anti auto-start)
+
+1. Deux téléphones : check-in avec le **même** `wave` (QR hôte actuel).
+2. **Sans** toucher au PC hôte → les deux doivent rester en **attente** (pas d’écran live).
+3. Tu cliques **Lancer maintenant** → là seulement ça passe en live.
+
+Si ça démarre encore tout seul à 2 personnes → tu n’es **pas** sur le dernier deploy (ou cache navigateur : essaie navigation privée).
 
 ---
 
@@ -90,7 +116,9 @@ Tu dois voir **exactement** :
   "demoMode": true,
   "roundDurationSec": 15,
   "totalRounds": 3,
-  "waveDurationMs": 300000
+  "waveDurationMs": 300000,
+  "commitShort": "e5b2844",
+  "buildLabel": null
 }
 ```
 

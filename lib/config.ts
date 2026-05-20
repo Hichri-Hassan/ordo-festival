@@ -26,12 +26,29 @@ export function getSessionSchedule(sessionId: string): Date {
   return start;
 }
 
+/** Infos pour vérifier que Railway sert le bon build (comparer au commit GitHub). */
+export function getDeployHint(): { commitShort: string | null; buildLabel: string | null } {
+  const sha =
+    process.env.RAILWAY_GIT_COMMIT_SHA ||
+    process.env.RAILWAY_GIT_COMMIT ||
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    process.env.GITHUB_SHA;
+  const commitShort =
+    sha && typeof sha === "string" && sha.length >= 7 ? sha.slice(0, 7) : null;
+  const label = process.env.ORDO_BUILD_LABEL;
+  return {
+    commitShort,
+    buildLabel: label && String(label).trim() ? String(label).trim() : null,
+  };
+}
+
 export function getPublicConfig() {
   return {
     demoMode: isDemoMode(),
     roundDurationSec: getRoundDurationSec(),
     totalRounds: getTotalRounds(),
     waveDurationMs: getWaveDurationMs(),
+    ...getDeployHint(),
   };
 }
 
