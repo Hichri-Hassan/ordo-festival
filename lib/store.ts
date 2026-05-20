@@ -26,7 +26,7 @@ function createSession(sessionId: SessionId): SessionState {
     totalRounds: getTotalRounds(),
     roundDurationSec: getRoundDurationSec(),
     roundStartedAt: null,
-    pairings: {},
+    partnerIds: {},
     icebreakers: {},
     waveCode: genWaveCode(),
     waveIssuedAt: now,
@@ -42,7 +42,7 @@ function rotateWave(session: SessionState): void {
   session.waveIssuedAt = Date.now();
   session.participantIds = [];
   session.checkedInIds = [];
-  session.pairings = {};
+  session.partnerIds = {};
   session.icebreakers = {};
   session.roundStartedAt = null;
   session.currentRound = 0;
@@ -142,16 +142,16 @@ export function checkIn(sessionId: SessionId, profileId: string, wave: string): 
 function startRound(session: SessionState, round: number): boolean {
   const participants = getValidCheckedInProfiles(session);
   if (participants.length < 2) {
-    session.pairings = {};
+    session.partnerIds = {};
     session.icebreakers = {};
     session.roundStartedAt = null;
     if (session.status === "live") session.status = "waiting";
     return false;
   }
 
-  const { pairings, icebreakers } = computePairings(participants, round);
+  const { partnerIds, icebreakers } = computePairings(participants, round);
   session.currentRound = round;
-  session.pairings = pairings;
+  session.partnerIds = partnerIds;
   session.icebreakers = icebreakers;
   session.roundStartedAt = Date.now();
   session.roundDurationSec = getRoundDurationSec();
@@ -201,7 +201,7 @@ export function advanceRound(sessionId: SessionId): SessionState {
     session.waveLocked = false;
     session.participantIds = [];
     session.checkedInIds = [];
-    session.pairings = {};
+    session.partnerIds = {};
     session.icebreakers = {};
     session.currentRound = 0;
     session.waveCode = genWaveCode();
@@ -223,7 +223,7 @@ export function resetSessionState(sessionId: SessionId): SessionState {
   session.status = "waiting";
   session.currentRound = 0;
   session.roundStartedAt = null;
-  session.pairings = {};
+  session.partnerIds = {};
   session.icebreakers = {};
   session.totalRounds = getTotalRounds();
   session.roundDurationSec = getRoundDurationSec();
@@ -267,7 +267,7 @@ export function getPartnerForUser(sessionId: SessionId, userId: string) {
     };
   }
 
-  if (session.status === "live" && !session.pairings[userId]) {
+  if (session.status === "live" && !session.partnerIds[userId]?.length) {
     const validCount = getValidCheckedInProfiles(session).length;
     if (validCount >= 2) {
       startRound(session, session.currentRound);
@@ -277,30 +277,36 @@ export function getPartnerForUser(sessionId: SessionId, userId: string) {
     }
   }
 
-  const partnerId = session.pairings[userId];
-  const partner = partnerId ? profiles.get(partnerId) : undefined;
+  const partnerIdList = session.partnerIds[userId] ?? [];
+  const partnerProfiles = partnerIdList
+    .map((id) => profiles.get(id))
+    .filter((p): p is Profile => Boolean(p));
+
+  const toPartnerView = (p: Profile) => ({
+    firstName: p.firstName,
+    studyYear: p.studyYear,
+    interests: p.interests,
+    lookingFor: p.lookingFor,
+  });
 
   const roundEndsAt =
     session.roundStartedAt && session.status === "live"
       ? session.roundStartedAt + session.roundDurationSec * 1000
       : null;
 
-  const sharedInterests = partner
-    ? me.interests.filter((i) => partner.interests.includes(i))
-    : [];
+  const sharedInterests = me.interests.filter((i) =>
+    partnerProfiles.some((p) => p.interests.includes(i))
+  );
+
+  const partners = partnerProfiles.map(toPartnerView);
 
   return {
     profileMissing: false as const,
     session,
     me,
-    partner: partner
-      ? {
-          firstName: partner.firstName,
-          studyYear: partner.studyYear,
-          interests: partner.interests,
-          lookingFor: partner.lookingFor,
-        }
-      : null,
+    partner: partners[0] ?? null,
+    partners,
+    isTrio: partners.length > 1,
     sharedInterests,
     icebreaker: session.icebreakers[userId] ?? "",
     roundEndsAt,

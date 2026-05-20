@@ -48,6 +48,8 @@ export async function GET(
     demoMode,
     profileMissing: false,
     partner: data.partner,
+    partners: data.partners,
+    isTrio: data.isTrio,
     sharedInterests: data.sharedInterests,
     icebreaker: data.icebreaker,
     round: s.currentRound + 1,

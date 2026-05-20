@@ -54,7 +54,8 @@ export type SessionState = {
   totalRounds: number;
   roundDurationSec: number;
   roundStartedAt: number | null;
-  pairings: Record<string, string>;
+  /** 1 id = paire, 2 ids = trio (nombre impair) */
+  partnerIds: Record<string, string[]>;
   icebreakers: Record<string, string>;
   /** Code dans l’URL check-in (?wave=). Change à chaque vague. */
   waveCode: string;

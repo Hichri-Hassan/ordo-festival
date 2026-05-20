@@ -6,13 +6,17 @@ import { useEffect, useState } from "react";
 import { Card, Heading, Logo, Page, Tag, TimerRing } from "@/components/ui";
 import { api, clearStoredProfileId, getStoredProfileId, isProfileNotFound } from "@/lib/client";
 
+type PartnerInfo = {
+  firstName: string;
+  studyYear: string;
+  interests: string[];
+  lookingFor: string[];
+};
+
 type PartnerPayload = {
-  partner: {
-    firstName: string;
-    studyYear: string;
-    interests: string[];
-    lookingFor: string[];
-  } | null;
+  partner: PartnerInfo | null;
+  partners?: PartnerInfo[];
+  isTrio?: boolean;
   sharedInterests: string[];
   icebreaker: string;
   round: number;
@@ -113,7 +117,10 @@ export default function LivePage() {
     );
   }
 
-  if (!data?.partner) {
+  const partnerList =
+    data?.partners?.length ? data.partners : data?.partner ? [data.partner] : [];
+
+  if (partnerList.length === 0) {
     const valid = data?.validCheckedIn ?? 0;
     return (
       <Page className="flex flex-col items-center justify-center text-center">
@@ -124,7 +131,8 @@ export default function LivePage() {
           <p>
             <strong className="text-[var(--color-ink)]">{valid}</strong> personne
             {valid !== 1 ? "s" : ""} prête{valid !== 1 ? "s" : ""} (check-in valide).
-            Il en faut <strong className="text-[var(--color-ink)]">2 minimum</strong>.
+            Il en faut <strong className="text-[var(--color-ink)]">2 minimum</strong>
+            {valid >= 3 ? " (groupe de 3 si nombre impair)" : ""}.
           </p>
           <ul className="mt-3 list-inside list-disc space-y-1">
             <li>Même session sur tous les appareils (ex. « Maintenant »)</li>
@@ -163,7 +171,8 @@ export default function LivePage() {
     );
   }
 
-  const { partner, sharedInterests, icebreaker, round, totalRounds } = data;
+  const { sharedInterests, icebreaker, round, totalRounds, isTrio } = data;
+  const isGroup = isTrio || partnerList.length > 1;
 
   return (
     <Page>
@@ -175,9 +184,31 @@ export default function LivePage() {
       </div>
 
       <Card className="mb-6 text-center">
-        <p className="text-sm text-[var(--color-ink-faint)]">Tu parles avec</p>
-        <h1 className="mt-1 text-4xl font-semibold tracking-tight">{partner.firstName}</h1>
-        <p className="mt-1 text-sm text-[var(--color-ink-muted)]">{partner.studyYear}</p>
+        <p className="text-sm text-[var(--color-ink-faint)]">
+          {isGroup ? "Ton groupe" : "Tu parles avec"}
+        </p>
+        {isGroup ? (
+          <div className="mt-3 space-y-4">
+            {partnerList.map((p) => (
+              <div key={p.firstName}>
+                <h1 className="text-3xl font-semibold tracking-tight">{p.firstName}</h1>
+                <p className="text-sm text-[var(--color-ink-muted)]">{p.studyYear}</p>
+              </div>
+            ))}
+            <p className="text-xs text-[var(--color-ink-faint)]">
+              Mettez-vous à 3 pour ce tour
+            </p>
+          </div>
+        ) : (
+          <>
+            <h1 className="mt-1 text-4xl font-semibold tracking-tight">
+              {partnerList[0].firstName}
+            </h1>
+            <p className="mt-1 text-sm text-[var(--color-ink-muted)]">
+              {partnerList[0].studyYear}
+            </p>
+          </>
+        )}
       </Card>
 
       {sharedInterests.length > 0 && (
