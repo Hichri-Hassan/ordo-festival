@@ -92,7 +92,7 @@ export default function SessionsPage() {
 
   const demo = meta?.demoMode ?? false;
   const footer = demo
-    ? `${meta?.totalRounds ?? 3} tours · ${meta?.roundDurationSec ?? 15} sec par personne · démarrage immédiat`
+    ? `${meta?.totalRounds ?? 3} tours · ${Math.round((meta?.roundDurationSec ?? 120) / 60)} min par personne · démarrage immédiat`
     : "~10 min · 5 rotations · 2 min par personne";
 
   return (

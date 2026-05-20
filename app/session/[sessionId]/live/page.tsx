@@ -32,7 +32,7 @@ export default function LivePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const router = useRouter();
   const [data, setData] = useState<PartnerPayload | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState(15);
+  const [secondsLeft, setSecondsLeft] = useState(120);
   const [transitioning, setTransitioning] = useState(false);
   const [total, setTotal] = useState(120);
   const [loadError, setLoadError] = useState<string | null>(null);

@@ -1,4 +1,4 @@
-/** Mode test : pas d'attente 14h–17h, tours de 15 s au lieu de 2 min */
+/** Mode test : pas d'attente 14h–17h ; mêmes tours de 2 min que le festival */
 export function isDemoMode(): boolean {
   return (
     process.env.ORDO_DEMO_MODE === "true" ||
@@ -7,7 +7,7 @@ export function isDemoMode(): boolean {
 }
 
 export function getRoundDurationSec(): number {
-  return isDemoMode() ? 15 : 120;
+  return 120;
 }
 
 export function getTotalRounds(): number {
