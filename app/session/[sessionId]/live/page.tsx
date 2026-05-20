@@ -171,6 +171,15 @@ export default function LivePage() {
     );
   }
 
+  if (!data) {
+    return (
+      <Page className="flex flex-col items-center justify-center text-center">
+        <Logo />
+        <p className="mt-4 animate-pulse text-[var(--color-ink-muted)]">Chargement…</p>
+      </Page>
+    );
+  }
+
   const { sharedInterests, icebreaker, round, totalRounds, isTrio } = data;
   const isGroup = isTrio || partnerList.length > 1;
 
